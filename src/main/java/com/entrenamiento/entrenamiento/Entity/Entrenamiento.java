@@ -5,8 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-// Esta clase representa cada registro de un jugador en un entrenamiento
-// osea, una fila = un jugador en un entrenamiento especifico (1, 2 o 3)
 @Entity
 public class Entrenamiento {
 
@@ -14,12 +12,12 @@ public class Entrenamiento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer numeroEntrenamiento; // 1, 2 o 3
+    private Integer numeroEntrenamiento; // puede ser 1, 2 o 3
     private String jugador;
     private Integer potenciaTiro;
     private Integer velocidad;
     private Integer pases;
-    private Double resultado; // esto se calcula solo, no lo manda el usuario
+    private Double resultado; // se calcula en el service, no llega del cliente
 
     public Entrenamiento() {
     }
@@ -34,24 +32,59 @@ public class Entrenamiento {
         this.resultado = resultado;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Integer getNumeroEntrenamiento() { return numeroEntrenamiento; }
-    public void setNumeroEntrenamiento(Integer numeroEntrenamiento) { this.numeroEntrenamiento = numeroEntrenamiento; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getJugador() { return jugador; }
-    public void setJugador(String jugador) { this.jugador = jugador; }
+    public Integer getNumeroEntrenamiento() {
+        return numeroEntrenamiento;
+    }
 
-    public Integer getPotenciaTiro() { return potenciaTiro; }
-    public void setPotenciaTiro(Integer potenciaTiro) { this.potenciaTiro = potenciaTiro; }
+    public void setNumeroEntrenamiento(Integer numeroEntrenamiento) {
+        this.numeroEntrenamiento = numeroEntrenamiento;
+    }
 
-    public Integer getVelocidad() { return velocidad; }
-    public void setVelocidad(Integer velocidad) { this.velocidad = velocidad; }
+    public String getJugador() {
+        return jugador;
+    }
 
-    public Integer getPases() { return pases; }
-    public void setPases(Integer pases) { this.pases = pases; }
+    public void setJugador(String jugador) {
+        this.jugador = jugador;
+    }
 
-    public Double getResultado() { return resultado; }
-    public void setResultado(Double resultado) { this.resultado = resultado; }
+    public Integer getPotenciaTiro() {
+        return potenciaTiro;
+    }
+
+    public void setPotenciaTiro(Integer potenciaTiro) {
+        this.potenciaTiro = potenciaTiro;
+    }
+
+    public Integer getVelocidad() {
+        return velocidad;
+    }
+
+    public void setVelocidad(Integer velocidad) {
+        this.velocidad = velocidad;
+    }
+
+    public Integer getPases() {
+        return pases;
+    }
+
+    public void setPases(Integer pases) {
+        this.pases = pases;
+    }
+
+    public Double getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(Double resultado) {
+        this.resultado = resultado;
+    }
 }
