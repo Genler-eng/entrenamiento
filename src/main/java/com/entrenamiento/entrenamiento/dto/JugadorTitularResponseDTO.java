@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class JugadorTitularResponseDTO {
     private String nombre;
-    private Double promedio;
+    private Double puntaje;
 }

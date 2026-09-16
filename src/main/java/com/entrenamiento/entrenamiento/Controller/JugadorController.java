@@ -1,11 +1,11 @@
-
 package com.entrenamiento.entrenamiento.Controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.entrenamiento.entrenamiento.dto.AlineacionTitularResponseDTO;
 import com.entrenamiento.entrenamiento.Service.JugadorService;
+import com.entrenamiento.entrenamiento.dto.AlineacionTitularResponseDTO;
 
 @RestController
 @RequestMapping("/jugadores")
@@ -17,8 +17,8 @@ public class JugadorController {
         this.jugadorService = jugadorService;
     }
 
-    @GetMapping("/equipo-titular")
-    public ResponseEntity<AlineacionTitularResponseDTO> obtenerEquipoTitular() {
-        return ResponseEntity.ok(jugadorService.obtenerEquipoTitular());
+    @GetMapping("/titulares")
+    public AlineacionTitularResponseDTO obtenerTitulares() {
+        return jugadorService.obtenerTitulares();
     }
 }

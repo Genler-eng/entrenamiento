@@ -1,13 +1,15 @@
 package com.entrenamiento.entrenamiento.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.entrenamiento.entrenamiento.Entity.Entrenamiento;
+import com.entrenamiento.entrenamiento.Entity.Jugador;
 import com.entrenamiento.entrenamiento.dto.AlineacionTitularResponseDTO;
 import com.entrenamiento.entrenamiento.dto.JugadorTitularResponseDTO;
 
@@ -20,54 +22,38 @@ public class JugadorService {
         this.entrenamientoService = entrenamientoService;
     }
 
-    public AlineacionTitularResponseDTO obtenerEquipoTitular() {
+    public AlineacionTitularResponseDTO obtenerTitulares() {
+        // Validar si están los 3 entrenamientos obligatorios
         if (!entrenamientoService.yaEstanLosTresEntrenamientos()) {
-            return new AlineacionTitularResponseDTO(
-                "todavia no estan los 3 entrenamientos de la semana, no se puede calcular el equipo titular", 
-                null
-            );
+            return new AlineacionTitularResponseDTO("No hay suficiente información para determinar el equipo titular.", null);
         }
 
-        List<Entrenamiento> registros = entrenamientoService.obtenerTodosLosRegistros();
-        List<JugadorTitularResponseDTO> tablaPromedios = calcularPromedios(registros);
-        
-        ordenarDeMayorAMenor(tablaPromedios);
+        List<Entrenamiento> todos = entrenamientoService.obtenerTodosLosRegistros();
 
-        List<JugadorTitularResponseDTO> titulares = tablaPromedios.subList(0, Math.min(5, tablaPromedios.size()));
+        // Agrupar entrenamientos por jugador y calcular su promedio
+        Map<Jugador, List<Entrenamiento>> porJugador = todos.stream()
+                .collect(Collectors.groupingBy(Entrenamiento::getJugador));
 
-        return new AlineacionTitularResponseDTO(null, titulares);
-    }
+        List<JugadorTitularResponseDTO> ranking = new ArrayList<>();
 
-    private List<JugadorTitularResponseDTO> calcularPromedios(List<Entrenamiento> registros) {
-        Map<String, Double> sumaPorJugador = new HashMap<>();
-        Map<String, Integer> conteoPorJugador = new HashMap<>();
+        for (Map.Entry<Jugador, List<Entrenamiento>> entry : porJugador.entrySet()) {
+            double promedio = entry.getValue().stream()
+                    .mapToDouble(Entrenamiento::getResultado)
+                    .average()
+                    .orElse(0.0);
 
-        for (Entrenamiento reg : registros) {
-            String nombre = reg.getJugador().getNombre();
-            
-            sumaPorJugador.put(nombre, sumaPorJugador.getOrDefault(nombre, 0.0) + reg.getResultado());
-            conteoPorJugador.put(nombre, conteoPorJugador.getOrDefault(nombre, 0) + 1);
+            // Redondear a 2 decimales
+            promedio = Math.round(promedio * 100.0) / 100.0;
+
+            ranking.add(new JugadorTitularResponseDTO(entry.getKey().getNombre(), promedio));
         }
 
-        List<JugadorTitularResponseDTO> promedios = new ArrayList<>();
-        for (String nombre : sumaPorJugador.keySet()) {
-            double promedio = sumaPorJugador.get(nombre) / conteoPorJugador.get(nombre);
-            promedios.add(new JugadorTitularResponseDTO(nombre, promedio));
-        }
+        // Ordenar de mayor a menor puntaje y tomar los 5 mejores
+        List<JugadorTitularResponseDTO> titulares = ranking.stream()
+                .sorted(Comparator.comparingDouble(JugadorTitularResponseDTO::getPuntaje).reversed())
+                .limit(5)
+                .collect(Collectors.toList());
 
-        return promedios;
-    }
-
-    private void ordenarDeMayorAMenor(List<JugadorTitularResponseDTO> lista) {
-        int n = lista.size();
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - 1 - i; j++) {
-                if (lista.get(j).getResultadoPromedio() < lista.get(j + 1).getResultadoPromedio()) {
-                    JugadorTitularResponseDTO aux = lista.get(j);
-                    lista.set(j, lista.get(j + 1));
-                    lista.set(j + 1, aux);
-                }
-            }
-        }
+        return new AlineacionTitularResponseDTO("Equipo titular generado correctamente", titulares);
     }
 }

@@ -1,12 +1,13 @@
 package com.entrenamiento.entrenamiento.Controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
-import com.entrenamiento.entrenamiento.dto.EntrenamientoResponseDTO;
 import com.entrenamiento.entrenamiento.Service.EntrenamientoService;
+import com.entrenamiento.entrenamiento.dto.EntrenamientoResponseDTO;
+import com.entrenamiento.entrenamiento.dto.EntrenamientoSaveRequestDTO;
 
 @RestController
 @RequestMapping("/entrenamientos")
@@ -19,7 +20,7 @@ public class EntrenamientoController {
     }
 
     @PostMapping
-    public ResponseEntity<EntrenamientoResponseDTO> registrar(@Valid @RequestBody EntrenamientoResponseDTO request) {
-        return new ResponseEntity<>(entrenamientoService.registrarEntrenamiento(request), HttpStatus.CREATED);
+    public EntrenamientoResponseDTO registrar(@RequestBody EntrenamientoSaveRequestDTO request) {
+        return entrenamientoService.registrarEntrenamiento(request);
     }
 }

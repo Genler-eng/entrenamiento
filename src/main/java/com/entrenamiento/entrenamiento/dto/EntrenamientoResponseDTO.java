@@ -5,18 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class EntrenamientoResponseDTO {
     private String mensaje;
 
-    public EstadisticasJugadorDTO[] getJugadores() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getJugadores'");
+    public String getMensaje() {
+        return mensaje;
     }
 
-    public Integer getNumeroEntrenamiento() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getNumeroEntrenamiento'");
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
     }
 }
