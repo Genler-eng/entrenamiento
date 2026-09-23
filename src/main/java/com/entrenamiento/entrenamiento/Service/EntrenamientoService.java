@@ -2,6 +2,7 @@ package com.entrenamiento.entrenamiento.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,6 @@ public class EntrenamientoService {
     private final EntrenamientoRepository entrenamientoRepository;
     private final JugadorRepository jugadorRepository;
 
-    private static final double PESO_POTENCIA = 0.20;
-    private static final double PESO_VELOCIDAD = 0.30;
-    private static final double PESO_PASES = 0.50;
-
     public EntrenamientoService(EntrenamientoRepository entrenamientoRepository, JugadorRepository jugadorRepository) {
         this.entrenamientoRepository = entrenamientoRepository;
         this.jugadorRepository = jugadorRepository;
@@ -30,19 +27,26 @@ public class EntrenamientoService {
 
     public EntrenamientoResponseDTO registrarEntrenamiento(EntrenamientoSaveRequestDTO request) {
         List<Entrenamiento> registros = new ArrayList<>();
+        List<EstadisticasJugadorDTO> jugadoresDto = request.getJugadores();
 
-        for (EstadisticasJugadorDTO j : request.getJugadores()) {
-            double resultado = (j.getPotenciaTiro() * PESO_POTENCIA)
-                             + (j.getVelocidad() * PESO_VELOCIDAD)
-                             + (j.getPases() * PESO_PASES);
+        for (int i = 0; i < jugadoresDto.size(); i++) {
+            EstadisticasJugadorDTO j = jugadoresDto.get(i);
+            
+            // Cálculo directo usando los porcentajes de forma literal en la fórmula
+            double resultado = (j.getPotenciaTiro() * 0.20)
+                             + (j.getVelocidad() * 0.30)
+                             + (j.getPases() * 0.50);
 
-            // Busca si el jugador existe por nombre; si no existe, lo crea y guarda
-            Jugador jugador = jugadorRepository.findByNombre(j.getNombre())
-                    .orElseGet(() -> {
-                        Jugador nuevoJugador = new Jugador();
-                        nuevoJugador.setNombre(j.getNombre());
-                        return jugadorRepository.save(nuevoJugador);
-                    });
+            Optional<Jugador> optJugador = jugadorRepository.findByNombre(j.getNombre());
+            Jugador jugador;
+
+            if (optJugador.isPresent()) {
+                jugador = optJugador.get();
+            } else {
+                Jugador nuevoJugador = new Jugador();
+                nuevoJugador.setNombre(j.getNombre());
+                jugador = jugadorRepository.save(nuevoJugador);
+            }
 
             Entrenamiento nuevoRegistro = new Entrenamiento();
             nuevoRegistro.setNumeroEntrenamiento(request.getNumeroEntrenamiento());

@@ -1,10 +1,9 @@
 package com.entrenamiento.entrenamiento.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -23,36 +22,65 @@ public class JugadorService {
     }
 
     public AlineacionTitularResponseDTO obtenerTitulares() {
-        // Validar si están los 3 entrenamientos obligatorios
         if (!entrenamientoService.yaEstanLosTresEntrenamientos()) {
             return new AlineacionTitularResponseDTO("No hay suficiente información para determinar el equipo titular.", null);
         }
 
         List<Entrenamiento> todos = entrenamientoService.obtenerTodosLosRegistros();
 
-        // Agrupar entrenamientos por jugador y calcular su promedio
-        Map<Jugador, List<Entrenamiento>> porJugador = todos.stream()
-                .collect(Collectors.groupingBy(Entrenamiento::getJugador));
+        Map<Jugador, List<Entrenamiento>> porJugador = new HashMap<>();
+        for (int i = 0; i < todos.size(); i++) {
+            Entrenamiento ent = todos.get(i);
+            Jugador jug = ent.getJugador();
+            
+            List<Entrenamiento> listaJugador = porJugador.get(jug);
+            if (listaJugador == null) {
+                listaJugador = new ArrayList<>();
+                porJugador.put(jug, listaJugador);
+            }
+            listaJugador.add(ent);
+        }
 
         List<JugadorTitularResponseDTO> ranking = new ArrayList<>();
 
         for (Map.Entry<Jugador, List<Entrenamiento>> entry : porJugador.entrySet()) {
-            double promedio = entry.getValue().stream()
-                    .mapToDouble(Entrenamiento::getResultado)
-                    .average()
-                    .orElse(0.0);
+            List<Entrenamiento> listaEntrenamientos = entry.getValue();
+            double suma = 0.0;
+            
+            for (int i = 0; i < listaEntrenamientos.size(); i++) {
+                suma += listaEntrenamientos.get(i).getResultado();
+            }
 
-            // Redondear a 2 decimales
+            double promedio = 0.0;
+            if (listaEntrenamientos.size() > 0) {
+                promedio = suma / listaEntrenamientos.size();
+            }
+
             promedio = Math.round(promedio * 100.0) / 100.0;
-
             ranking.add(new JugadorTitularResponseDTO(entry.getKey().getNombre(), promedio));
         }
 
-        // Ordenar de mayor a menor puntaje y tomar los 5 mejores
-        List<JugadorTitularResponseDTO> titulares = ranking.stream()
-                .sorted(Comparator.comparingDouble(JugadorTitularResponseDTO::getPuntaje).reversed())
-                .limit(5)
-                .collect(Collectors.toList());
+        for (int i = 0; i < ranking.size() - 1; i++) {
+            for (int j = 0; j < ranking.size() - 1 - i; j++) {
+                JugadorTitularResponseDTO actual = ranking.get(j);
+                JugadorTitularResponseDTO siguiente = ranking.get(j + 1);
+                
+                if (actual.getPuntaje() < siguiente.getPuntaje()) {
+                    ranking.set(j, siguiente);
+                    ranking.set(j + 1, actual);
+                }
+            }
+        }
+
+        List<JugadorTitularResponseDTO> titulares = new ArrayList<>();
+        int limite = 5;
+        if (ranking.size() < 5) {
+            limite = ranking.size();
+        }
+
+        for (int i = 0; i < limite; i++) {
+            titulares.add(ranking.get(i));
+        }
 
         return new AlineacionTitularResponseDTO("Equipo titular generado correctamente", titulares);
     }

@@ -12,9 +12,4 @@ public class EstadisticasJugadorDTO {
     private Integer potenciaTiro;
     private Integer velocidad;
     private Integer pases;
-
-    public String getNombre() { return nombre; }
-    public Integer getPotenciaTiro() { return potenciaTiro; }
-    public Integer getVelocidad() { return velocidad; }
-    public Integer getPases() { return pases; }
 }
