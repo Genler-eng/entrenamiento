@@ -12,14 +12,13 @@ import com.entrenamiento.entrenamiento.Entity.Jugador;
 import com.entrenamiento.entrenamiento.dto.AlineacionTitularResponseDTO;
 import com.entrenamiento.entrenamiento.dto.JugadorTitularResponseDTO;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class JugadorService {
 
     private final EntrenamientoService entrenamientoService;
-
-    public JugadorService(EntrenamientoService entrenamientoService) {
-        this.entrenamientoService = entrenamientoService;
-    }
 
     public AlineacionTitularResponseDTO obtenerTitulares() {
         if (!entrenamientoService.yaEstanLosTresEntrenamientos()) {
@@ -57,7 +56,9 @@ public class JugadorService {
             }
 
             promedio = Math.round(promedio * 100.0) / 100.0;
-            ranking.add(new JugadorTitularResponseDTO(entry.getKey().getNombre(), promedio));
+            
+            JugadorTitularResponseDTO titularDto = new JugadorTitularResponseDTO(entry.getKey().getNombre(), promedio);
+            ranking.add(titularDto);
         }
 
         for (int i = 0; i < ranking.size() - 1; i++) {

@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor 
 public class Entrenamiento {
 
     @Id
@@ -32,13 +34,4 @@ public class Entrenamiento {
     private Integer velocidad;
     private Integer pases;
     private Double resultado;
-
-    public Entrenamiento(Integer numeroEntrenamiento, Jugador jugador, Integer potenciaTiro, Integer velocidad, Integer pases, Double resultado) {
-        this.numeroEntrenamiento = numeroEntrenamiento;
-        this.jugador = jugador;
-        this.potenciaTiro = potenciaTiro;
-        this.velocidad = velocidad;
-        this.pases = pases;
-        this.resultado = resultado;
-    }
 }

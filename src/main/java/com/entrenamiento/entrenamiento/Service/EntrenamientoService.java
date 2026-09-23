@@ -14,16 +14,14 @@ import com.entrenamiento.entrenamiento.dto.EntrenamientoResponseDTO;
 import com.entrenamiento.entrenamiento.dto.EntrenamientoSaveRequestDTO;
 import com.entrenamiento.entrenamiento.dto.EstadisticasJugadorDTO;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class EntrenamientoService {
 
     private final EntrenamientoRepository entrenamientoRepository;
     private final JugadorRepository jugadorRepository;
-
-    public EntrenamientoService(EntrenamientoRepository entrenamientoRepository, JugadorRepository jugadorRepository) {
-        this.entrenamientoRepository = entrenamientoRepository;
-        this.jugadorRepository = jugadorRepository;
-    }
 
     public EntrenamientoResponseDTO registrarEntrenamiento(EntrenamientoSaveRequestDTO request) {
         List<Entrenamiento> registros = new ArrayList<>();
@@ -32,7 +30,6 @@ public class EntrenamientoService {
         for (int i = 0; i < jugadoresDto.size(); i++) {
             EstadisticasJugadorDTO j = jugadoresDto.get(i);
             
-            // Cálculo directo usando los porcentajes de forma literal en la fórmula
             double resultado = (j.getPotenciaTiro() * 0.20)
                              + (j.getVelocidad() * 0.30)
                              + (j.getPases() * 0.50);
@@ -48,18 +45,22 @@ public class EntrenamientoService {
                 jugador = jugadorRepository.save(nuevoJugador);
             }
 
-            Entrenamiento nuevoRegistro = new Entrenamiento();
-            nuevoRegistro.setNumeroEntrenamiento(request.getNumeroEntrenamiento());
-            nuevoRegistro.setJugador(jugador);
-            nuevoRegistro.setPotenciaTiro(j.getPotenciaTiro());
-            nuevoRegistro.setVelocidad(j.getVelocidad());
-            nuevoRegistro.setPases(j.getPases());
-            nuevoRegistro.setResultado(resultado);
+            
+            Entrenamiento nuevoRegistro = new Entrenamiento(
+                 null,
+                request.getNumeroEntrenamiento(),
+                jugador,
+                j.getPotenciaTiro(),
+                j.getVelocidad(),
+                j.getPases(),
+                resultado
+            );
 
             registros.add(nuevoRegistro);
         }
 
         entrenamientoRepository.saveAll(registros);
+
         return new EntrenamientoResponseDTO("entrenamiento numero " + request.getNumeroEntrenamiento() + " guardado correctamente");
     }
 
